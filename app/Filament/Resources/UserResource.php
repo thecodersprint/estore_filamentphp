@@ -21,6 +21,7 @@ use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\RelationManagers;
+use Filament\Forms\Components\Select;
 
 class UserResource extends Resource
 {
@@ -39,6 +40,10 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
+                    Select::make('roles')
+                    ->required()
+                    ->relationship('roles', 'name')
+                    ->searchable(),
                     TextInput::make('password')
                     ->password()->confirmed()
                     ->dehydrateStateUsing(fn ($state) => Hash::make($state))
@@ -61,6 +66,7 @@ class UserResource extends Resource
                 ImageColumn::make('photo'),
                 TextColumn::make('name')->sortable()->searchable(),
                 TextColumn::make('email')->sortable()->searchable(),
+                TextColumn::make('roles.name')->sortable()->searchable(),
                 TextColumn::make('created_at')->date('d-M-Y')->sortable(),
             ])
             ->filters([
