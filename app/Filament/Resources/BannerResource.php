@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\BannerResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\BannerResource\RelationManagers;
+use Illuminate\Database\Eloquent\Model;
 
 class BannerResource extends Resource
 {
@@ -26,6 +28,18 @@ class BannerResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->hasPermissionTo('view_banner');
+    }
+    public static function canCreate(): bool
+    {
+        return Auth::user()->hasPermissionTo('create_banner');
+    }
+    public static function canDelete(Model $record): bool
+    {
+        return Auth::user()->hasPermissionTo('delete_banner');
+    }
     public static function form(Form $form): Form
     {
         return $form
@@ -74,8 +88,9 @@ class BannerResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
+
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->visible(true),
                 ]),
             ]);
     }
